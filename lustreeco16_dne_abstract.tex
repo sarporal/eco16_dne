@@ -74,6 +74,15 @@
 
 \newcommand\modified[1]{{\color{green}#1}}
 
+\usepackage{listings}
+
+\lstset{ %
+language=bash,           % choose the language of the code
+numbers=left,           % where to put the line-numbers
+numberstyle=\tiny,      % the size of the fonts that are used for the line-numbers
+basicstyle=\footnotesize    % the size of the fonts that are used for the line-numbers
+}
+
 
 % Some very useful LaTeX packages include:
 % (uncomment the ones you want to load)
@@ -312,6 +321,8 @@
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
 
+%define code 
+\def\code#1{\texttt{#1}}
 
 \begin{document}
 %
@@ -334,7 +345,17 @@ Oak Ridge National Laboratory\\
 Oak Ridge, Tennessee, U.S.A\\
 \{hanleyja, simmonsja, oralhs, leverman\}@ornl.gov}
 \thanks{
-This manuscript has been authored by UT-Battelle, LLC under Contract No. DE-AC05-00OR22725 with the U.S. Department of Energy. The United States Government retains and the publisher, by accepting the article for publication, acknowledges that the United States Government retains a non-exclusive, paid-up, irrevocable, world-wide license to publish or reproduce the published form of this manuscript, or allow others to do so, for United States Government purposes. The Department of Energy will provide public access to these results of federally sponsored research in accordance with the DOE Public Access Plan (http://energy.gov/downloads/doe-public-access-plan).
+
+This manuscript has been authored by UT-Battelle, LLC under Contract No.
+DE-AC05-00OR22725 with the U.S. Department of Energy. The United States
+Government retains and the publisher, by accepting the article for publication,
+acknowledges that the United States Government retains a non-exclusive,
+paid-up, irrevocable, world-wide license to publish or reproduce the published
+form of this manuscript, or allow others to do so, for United States Government
+purposes. The Department of Energy will provide public access to these results
+of federally sponsored research in accordance with the DOE Public Access Plan
+(http://energy.gov/downloads/doe-public-access-plan).
+
 }
 }
 
@@ -450,22 +471,22 @@ Both Atlas namespaces are built using the Lustre technology. Lustre is an
 open-source parallel file system technology that is currently used over 70% of
 the Top500 systems around the world. Lustre is a high-performance file system
 scalable to tens of thousands of clients. Although Lustre can achieve very high
-file I/O performance numbers (e.g. 3 TB/s @ Rikken, Japan, +1 TB/s @ Titan,
+file I/O performance numbers (e.g. 3 TB/s at Rikken, Japan, +1 TB/s at Titan,
 OLCF and BlueWaters, NCSA), it supported only one metadata server per file
 system namespace until recently. This was one of the biggest limitations Lustre
 had. To alleviate this problem, OpenSFS contracted Intel to develop a solution
-(http://wiki.opensfs.org/Contract_SFS-DEV-001).  The Distributed Namespace
-(DNE) development effort started in 2011 and targeted improving the metadata
-server scalability.  The DNE effort was split up into two development phases.
-Phase 1 (DNE P1) provided metadata support for directories distributed over
-remote metadata server (MDS) nodes and metadata target (MDT) devices. This
-feature was released to public in Lustre version 2.4 in 2012. In Phase 2 (DNE
-P2), the capability for splitting up a single directory over remote MDS nodes
-and MDT devices was added. This will be released to public in Lustre version
-2.8.  This document summarizes OLCF’s efforts in evaluating the Lustre DNE
-feature. The OLCF’s plan is deploy DNE P2 into production by the second half of
-2016, however, OLCF tests with DNE P2 is not yet complete and this document
-will updated with new results in the near future.
+\cite{dne-contract}.  The Distributed Namespace (DNE) development effort
+started in 2011 and targeted improving the metadata server scalability.  The
+DNE effort was split up into two development phases.  Phase 1 (DNE P1) provided
+metadata support for directories distributed over remote metadata server (MDS)
+nodes and metadata target (MDT) devices. This feature was released to public in
+Lustre version 2.4 in 2012. In Phase 2 (DNE P2), the capability for splitting
+up a single directory over remote MDS nodes and MDT devices was added. This
+will be released to public in Lustre version 2.8.  This document summarizes
+OLCF’s efforts in evaluating the Lustre DNE feature. The OLCF’s plan is deploy
+DNE P2 into production by the second half of 2016, however, OLCF tests with DNE
+P2 is not yet complete and this document will updated with new results in the
+near future.
 
 \subsection{Metadata Contention}
 
@@ -483,58 +504,67 @@ resources to specific directories within the file system.
 
 \section{What is DNE}
 
-The DNE contract (http://wiki.opensfs.org/Contract_SFS-DEV-001) was awarded to
-Whamcloud (now Intel HPDD) in 2011, and defined the Lustre development for
-three projects and eight subprojects. These three projects were issued as a
-single contract since they were complementing each other. Overall, these three
-development efforts effectively remove the metadata contention problem on
-Lustre. Of these three projects, Project 1 focused on improving the single
-server metadata performance and provided SMP node affinity and parallel
-directory support. The second project (i.e. DNE) targeted distributing the
-metadata load on remote and striped directories. The third project was
-architected to improve the Lustre file system checker to provide support in
-light of the first projects.  DNE P1 enabled deployment of multiple MDTs on
-multiple MDS nodes and Lustre sub-directories were now distributed over
-multiple metadata targets (MDTs). Sub-directory distribution was defined as an
-administrative operation and was executed using the Lustre specific lfs mkdir
-command. Figure 1 illustrates the Lustre remote directory and sub-directory
-concepts. By choice, it was functionality restricted to only specially created
-directories to remote MDTs (remote directories with their parent directory on
-MDT0; remote directories with parent directories on other MDTs was made
-possible with administrator override) and it included capabilities such as user
-tools to create directories on a specific remote MDT and to display on which
-MDT a directory or file is located. 
- 
-Figure 1: DNE P1 Remote Directories (Courtesy of OpenSFS)
+The DNE contract~\cite{dne-contract} was awarded to Whamcloud (now Intel HPDD)
+in 2011, and defined the Lustre development for three projects and eight
+sub projects. These three projects were issued as a single contract since they
+were complementing each other. Overall, these three development efforts
+effectively remove the metadata contention problem on Lustre. Of these three
+projects, Project 1 focused on improving the single server metadata performance
+and provided SMP node affinity and parallel directory support. The second
+project (i.e. DNE) targeted distributing the metadata load on remote and
+striped directories. The third project was architected to improve the Lustre
+file system checker to provide support in light of the first projects.  DNE P1
+enabled deployment of multiple MDTs on multiple MDS nodes and Lustre
+sub-directories were now distributed over multiple metadata targets (MDTs).
+Sub-directory distribution was defined as an administrative operation and was
+executed using the Lustre specific \code{lfs mkdir} command. Figure 1 illustrates the
+Lustre remote directory and sub-directory concepts. By choice, it was
+functionality restricted to only specially created directories to remote MDTs
+(remote directories with their parent directory on MDT0; remote directories
+with parent directories on other MDTs was made possible with administrator
+override) and it included capabilities such as user tools to create directories
+on a specific remote MDT and to display on which MDT a directory or file is
+located. 
 
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.5\textwidth]{figs/dnep1}
+  \caption{DNE P1 Remote Directories (Courtesy of OpenSFS)}
+\end{figure}
+ 
 DNE P2 will provide Lustre the capability to create striped directory in a
 similar fashion as bulk I/O is distributed across OSTs. The OSS bulk I/O
 packets are distributed in a round robin fashion with applied weights to help
 keep OST usage nearly the same across the namespace. In the case of meta data
 the distribution is based on a hash calculated for the file in interest. You
-can control the hashing done for a striped directory with lfs setdirstripe
-using the –t or --hash-type option. Currently only two options are available,
-all_char which is sum of ASCII characters modulo number of MDTs, or fnv_1a_64
-that is the Fowler-Noll-Vo (FNV-1a) algorithm. From the previous example you
-can see the user interface has moved from DNE P1 lfs mkdir [option] to using
-lfs setdirstripe [option] for DNE P2. Much like DNE P1 directories creation can
+can control the hashing done for a striped directory with \code{lfs setdirstripe}
+using the \code{–t} or \code{--hash-type} option. Currently only two options are available,
+\code{all\_char} which is sum of ASCII characters modulo number of MDTs, or \code{fnv\_1a\_64}
+that is the \code{Fowler-Noll-Vo (FNV-1a)} algorithm. From the previous example you
+can see the user interface has moved from DNE P1 \code{lfs mkdir} to using
+\code{lfs setdirstripe}  for DNE P2. Much like DNE P1 directories creation can
 be limited to personnel with root privileges. By default, only directories on
 the very first MDT can contain directories that are not on the same MDT. Figure
 2 illustrates this Lustre striped directory concept, where a striped directory
 is defined as the contents of a given directory are distributed over multiple
 MDTs.  Looking back to Figure 1 you will see a similar limitation with DNE P1
 in which data from the root remote directory is cached on the first MDT.  
- 
-Figure 2: DNE P2 Stripe Directories (Courtesy of OpenSFS)
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.5\textwidth]{figs/dnep2}
+  \caption{DNE P2 Remote Directories (Courtesy of OpenSFS)}
+\end{figure}
 
 In either case we can see the limitation is that MDT1 contains a
 disproportionate amount of data. In my testing when the file and directory
 count reached high enough the first MDT filled rapidly. Especial in my case the
 first MDT was the smallest in my test cluster. For DNE P2 it is possible to
 create remote directories with its parent directory located place on any MDT
-when you enable remote_dir. This can be done by issuing the follow command:
+when you enable \code{remote\_dir}. This can be done by issuing the follow command:
 
-lctl set_param mdt.*.enable_remote_dir=1
+\code{lctl set\_param mdt.*.enable\_remote\_dir=1}
 
 to all available MDS servers. Another feature available in DNE P2 is the
 ability to allow non root users to create remote directories. Currently you can
@@ -543,20 +573,20 @@ create a remote directory which handles the case of specific non root
 administrative accounts. Lastly you can allow all groups. The way to manage
 this feature is by issuing the following command to all MDS servers:
 
-lct set_param mdt.*.enable_remote_dir_gid=”group_id” 
+\code{lct set\_param mdt.*.enable\_remote\_dir\_gid=``group\_id''} 
 
-To allow any user to create remove directories set “group_id” to -1. So far all
+To allow any user to create remove directories set \code{``group\_id''} to \code{-1}. So far all
 the functionality discussed has pertained specifically to DNE2. More
-functionality exist to the lfs setdirstripe which was modeled after the same
-functionality seen with lfs setstripe; which is used to manage I/O bulk data
+functionality exist to the \code{lfs setdirstripe} which was modeled after the same
+functionality seen with \code{lfs setstripe}; which is used to manage I/O bulk data
 placement on the OSS servers. This was to done to make it easy for new users to
-learn quickly this tool since they are already familiar with lfs getstripe. The
-lfs setdirstripe like its counter part allows setting the striping count and
+learn quickly this tool since they are already familiar with \code{lfs getstripe}. The
+\code{lfs setdirstripe} like its counter part allows setting the striping count and
 striping index. The striping index can be used to control which MDT to be first
 use to store meta data information. This is most helpful in the case to avoid
 MDTs that lack enough disk space. The stripe count determines how many MDTs
-will be used to store the file’s meta data for a remote directory. Lastly like
-a -D option is available to lfs setdirstripe to allow the inheritance of the
+will be used to store the file's meta data for a remote directory. Lastly like
+a \code{-D} option is available to \code{lfs setdirstripe} to allow the inheritance of the
 remote directories configuration.
 
 
@@ -566,14 +596,14 @@ remote directories configuration.
 
 Our test environment consisted Arthur, which is a single Cray XK7 cabinet with
 XYZ nodes. Arthur at the time of DNE P1 tests were running Cray CLE 5.2.UP02
-operating system. The Lustre version on clients was 2.5.3. 16 separate x86_64
+operating system. The Lustre version on clients was 2.5.3. 16 separate x86\_64
 systems were configured as Lustre MDS nodes. Servers were running Lustre
 version 2.5.3. Each node had a single Toshiba MBF2600RC Serial Attached SCSI
 SSD device. These were configured as MDTs, one per MDS.  We used an in-house
 modified version of the mdtest benchmark version 1.8.3. Our modification
-allowed mdtest to use precreated directories, which was essential in testing
+allowed mdtest to use pre-created directories, which was essential in testing
 the DNE P1. In the standard mdtest each iteration of test creates a new
-directory #test-dir.’iteration’ which will always be the non-DNE case. To work
+directory \code{test-dir}.The \code{`iteration'} which will always be the non-DNE case. To work
 around this case mdtest was modified to use detect the already existing test
 directories. The second change is mdtest runs it test against each test
 directory one at  a time but since each directory is located on a single MDT
@@ -589,13 +619,20 @@ directory load. Tests were carried out on October 2014. We used 19 client nodes
 on Arthur with 32 tasks per each, 608 tasks total for the tests. Each test were
 repeated for 10 iterations. A test sample output is given below:
 
+\begin{lstlisting}
 
 -- started at 10/21/2014 14:22:23 --
-mdtest-1.8.3 was launched with 608 total task(s) on 19 nodes
-Command line used: /lustre/sultan/stf008/scratch/jsimmons/mdtest -i 10 -I 1000 -v -u -d /lustre/sultan/stf008/scratch/jsimmons/test_mdt0@/lustre/sultan/stf008/scratch/jsimmons/test_mdt1
+mdtest-1.8.3 was launched with 608 total task(s) 
+on 19 nodes
+Command line used: /lustre/sultan/stf008/scratch
+/jsimmons/mdtest -i 10 -I 1000 -v -u -d /lustre
+/sultan/stf008/scratch/jsimmons/test_mdt0@
+/lustre/sultan/stf008/scratch/jsimmons/test_mdt1
 Path: /lustre/sultan/stf008/scratch/jsimmons
-FS: 797.1 TiB   Used FS: 0.0%   Inodes: 398.7 Mi   Used Inodes: 0.0%
+FS: 797.1 TiB   Used FS: 0.0%   Inodes: 398.7 Mi
+   Used Inodes: 0.0%
 608 tasks, 608000 files/directories
+
 Operation               Duration              Rate
    ---------               --------              ----
  * iteration 1 *
@@ -702,7 +739,9 @@ SUMMARY: (of 10 iterations)
    Tree removal      :     20.433      0.114     11.901      5.570
 
 -- finished at 10/21/2014 14:49:01 --
-Application 183 resources: utime ~174191s, stime ~9984s, Rss ~8752, inblocks ~123436, outblocks ~259931
+Application 183 resources: utime ~174191s, stime ~9984s, 
+Rss ~8752, inblocks ~123436, outblocks ~259931
+\end{lstlisting}
 
 Figure 3 shows DNE P1 testing for directory IOPs rates with respect to
 increasing MDS nodes. As can be seen, directory deletions quadruple the
@@ -713,8 +752,14 @@ quite slow compared to deletions and stats, and best performance is obtained at
 13 MDS nodes. From these results, OLCF determined that the best deployment
 options were to limit the number of MDS nodes to four, if directory operation
 rates were the primary performance concern.
- 
-Figure 3: DNE P1 directory test results
+
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.5\textwidth]{figs/dnep1_dir_results}
+  \caption{DNE P1 directory test results}
+\end{figure}
+
 
 Figure 4 shows our DNE P1 test results with file operations. As can be seen,
 file deletion operations scale up nicely up to 15 MDS nodes, where increasing
@@ -722,8 +767,14 @@ number of MDS nodes hurts file stat operation rates. File creation performance
 doubles up until five MDS nodes only.  Combining DNE P1 test results for
 directory and file operations, best rule of thumb was determined as 4 MDS nodes
 per namespace for production deployments.
+
+
+\begin{figure}[!ht]
+  \centering
+    \includegraphics[width=0.5\textwidth]{figs/dnep1_file_results}
+  \caption{DNE P1 file test results}
+\end{figure}
  
-Figure 4: DNE P1 file test results
 
 
 \subsection{DNE P2}
@@ -731,13 +782,13 @@ Figure 4: DNE P1 file test results
 Our test environment consisted Arthur, which is a single Cray XK7 cabinet with
 XYZ nodes. Arthur at the time of DNE P2 tests were running Cray CLE 5.2.UP02
 operating system. The Lustre version on clients was a specially built pre 2.8
-client with a constant evolving patch set. Sixteen separate x86_64 systems were
+client with a constant evolving patch set. Sixteen separate x86\_64 systems were
 configured as Lustre MDS nodes. Servers were running the same Lustre pre 2.8
 version as the clients. Each node had a single Toshiba MBF2600RC Serial
 Attached SCSI SSD device. These were configured as MDTs, one per MDS. 
 
 We used the same in-house modified version of the mdtest benchmark version
-1.8.3. Our modification allowed mdtest to use precreated directories, which was
+1.8.3. Our modification allowed mdtest to use pre-created directories, which was
 essential in testing the DNE P1. The mdtest benchmark execution script can be
 found in Appendix A. The modified mdtest source code will be publicly available
 soon.
@@ -750,8 +801,8 @@ repeated for 10 iterations.
 
 \section{Production Deployment}
 
-This report has focused mainly on the software side of the DNE Phase 2 rollout,
-however it is important to understand the OLCF’s considerations for the
+This report has focused mainly on the software side of the DNE Phase 2 roll-out,
+however it is important to understand the OLCF's considerations for the
 hardware side of this upgrade. We currently have a single metadata server per
 Atlas file system. The plan for production is to increase to four metadata
 servers per Atlas file system (eight total). Our current production metadata
@@ -828,6 +879,7 @@ Sarp: This is probably not needed but I am making a dump from the tech report, a
 
 Mdtest script
 
+\begin{verbatim}[fontsize=\small]
 #!/bin/bash
 #PBS -l nodes=20
 #PBS -l walltime=24:00:00
@@ -868,7 +920,7 @@ do
 	#	aprun -n $threads -N $nodes $BINDIR/mdtest -I $(( $filecount / $threads)) -i $ITER -u  -d $OUTDIR/unique_${TOTAL}k_$threads
 	#done
 done
-
+\end{verbatim}
 
 
 \section{Conclusions \& Future Work}
@@ -917,8 +969,6 @@ Ack Hyperion too.
 % (used to reserve space for the reference number labels box)
 \begin{thebibliography}{1}
 
-\bibitem{lfs_composite_layout}
-OpenSFS, "Layout Enhancement High Level Design", February 2014. \texttt{http://wiki.opensfs.org/Contract\_SFS-DEV-003}
 
 \bibitem{ior}
 "chaos/ior - Parallel filesystem I/O benchmark", \texttt{https://github.com/chaos/ior}.
@@ -928,6 +978,9 @@ Joel Reed et al., "Evaluating Dynamic File Striping for Lustre", \emph{Internati
 
 \bibitem{sarp-cug}
 Sarp Oral et al., "OLCF`s 1TB$/$s, Next-Generation Lustre File System", \emph{Cray User Group 2013}, May 2013.
+
+\bibitem{dne-contract}
+"OpenSFS DNE Contract", \texttt{http://wiki.opensfs.org/Contract\_SFS-DEV-001}.
 
 \end{thebibliography}
 

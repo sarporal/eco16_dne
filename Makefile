@@ -6,7 +6,7 @@ TARGETS = $(PAPER).pdf
 default: pdf
 
 pdf: $(SOURCES)
-	pdflatex $(PAPER) || pdflatex $(PAPER)
+	pdflatex $(PAPER) || pdflatex $(PAPER) || bibtex $(PAPER) || pdflatex $(PAPER)
 
 clean:
 	for tmp in $(TEMPS) ; do $(RM) $$tmp ; done 
