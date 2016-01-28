@@ -321,8 +321,6 @@ basicstyle=\footnotesize    % the size of the fonts that are used for the line-n
 % correct bad hyphenation here
 \hyphenation{op-tical net-works semi-conduc-tor}
 
-%define code 
-\def\code#1{\texttt{#1}}
 
 \begin{document}
 %
@@ -516,7 +514,7 @@ file system checker to provide support in light of the first projects.  DNE P1
 enabled deployment of multiple MDTs on multiple MDS nodes and Lustre
 sub-directories were now distributed over multiple metadata targets (MDTs).
 Sub-directory distribution was defined as an administrative operation and was
-executed using the Lustre specific \code{lfs mkdir} command. Figure 1 illustrates the
+executed using the Lustre specific {\footnotesize{\texttt{lfs mkdir}}} command. Figure 1 illustrates the
 Lustre remote directory and sub-directory concepts. By choice, it was
 functionality restricted to only specially created directories to remote MDTs
 (remote directories with their parent directory on MDT0; remote directories
@@ -537,16 +535,20 @@ similar fashion as bulk I/O is distributed across OSTs. The OSS bulk I/O
 packets are distributed in a round robin fashion with applied weights to help
 keep OST usage nearly the same across the namespace. In the case of meta data
 the distribution is based on a hash calculated for the file in interest. You
-can control the hashing done for a striped directory with \code{lfs setdirstripe}
-using the \code{–t} or \code{--hash-type} option. Currently only two options are available,
-\code{all\_char} which is sum of ASCII characters modulo number of MDTs, or \code{fnv\_1a\_64}
-that is the \code{Fowler-Noll-Vo (FNV-1a)} algorithm. From the previous example you
-can see the user interface has moved from DNE P1 \code{lfs mkdir} to using
-\code{lfs setdirstripe}  for DNE P2. Much like DNE P1 directories creation can
-be limited to personnel with root privileges. By default, only directories on
-the very first MDT can contain directories that are not on the same MDT. Figure
-2 illustrates this Lustre striped directory concept, where a striped directory
-is defined as the contents of a given directory are distributed over multiple
+can control the hashing done for a striped directory with
+{\footnotesize{\texttt{lfs setdirstripe}}} using the
+{\footnotesize{\texttt{–t}}} or {\footnotesize{\texttt{--hash-type}}} option.
+Currently only two options are available, {\footnotesize{\texttt{all\_char}}}
+which is sum of ASCII characters modulo number of MDTs, or
+{\footnotesize{\texttt{fnv\_1a\_64}}} that is the
+{\footnotesize{\texttt{Fowler-Noll-Vo (FNV-1a)}}} algorithm. From the previous
+example you can see the user interface has moved from DNE P1
+{\footnotesize{\texttt{lfs mkdir}}} to using {\footnotesize{\texttt{lfs
+setdirstripe}}}  for DNE P2. Much like DNE P1 directories creation can be
+limited to personnel with root privileges. By default, only directories on the
+very first MDT can contain directories that are not on the same MDT. Figure 2
+illustrates this Lustre striped directory concept, where a striped directory is
+defined as the contents of a given directory are distributed over multiple
 MDTs.  Looking back to Figure 1 you will see a similar limitation with DNE P1
 in which data from the root remote directory is cached on the first MDT.  
 
@@ -561,9 +563,9 @@ disproportionate amount of data. In my testing when the file and directory
 count reached high enough the first MDT filled rapidly. Especial in my case the
 first MDT was the smallest in my test cluster. For DNE P2 it is possible to
 create remote directories with its parent directory located place on any MDT
-when you enable \code{remote\_dir}. This can be done by issuing the follow command:
+when you enable {\footnotesize{\texttt{remote\_dir}}}. This can be done by issuing the follow command:
 
-\code{lctl set\_param mdt.*.enable\_remote\_dir=1}
+{\footnotesize{\texttt{lctl set\_param mdt.*.enable\_remote\_dir=1}}}
 
 to all available MDS servers. Another feature available in DNE P2 is the
 ability to allow non root users to create remote directories. Currently you can
@@ -572,20 +574,21 @@ create a remote directory which handles the case of specific non root
 administrative accounts. Lastly you can allow all groups. The way to manage
 this feature is by issuing the following command to all MDS servers:
 
-\code{lct set\_param mdt.*.enable\_remote\_dir\_gid=``group\_id''} 
+{\footnotesize{\texttt{{lct set\_param mdt.*.enable\_remote\_dir\_gid
+=``group\_id''}}}} 
 
-To allow any user to create remove directories set \code{``group\_id''} to \code{-1}. So far all
+To allow any user to create remove directories set {\footnotesize{\texttt{``group\_id''}}} to {\footnotesize{\texttt{-1}}}. So far all
 the functionality discussed has pertained specifically to DNE2. More
-functionality exist to the \code{lfs setdirstripe} which was modeled after the same
-functionality seen with \code{lfs setstripe}; which is used to manage I/O bulk data
+functionality exist to the {\footnotesize{\texttt{lfs setdirstripe}}} which was modeled after the same
+functionality seen with {\footnotesize{\texttt{lfs setstripe}}}; which is used to manage I/O bulk data
 placement on the OSS servers. This was to done to make it easy for new users to
-learn quickly this tool since they are already familiar with \code{lfs getstripe}. The
-\code{lfs setdirstripe} like its counter part allows setting the striping count and
+learn quickly this tool since they are already familiar with {\footnotesize{\texttt{lfs getstripe}}}. The
+{\footnotesize{\texttt{{lfs setdirstripe}}}} like its counter part allows setting the striping count and
 striping index. The striping index can be used to control which MDT to be first
 use to store meta data information. This is most helpful in the case to avoid
 MDTs that lack enough disk space. The stripe count determines how many MDTs
 will be used to store the file's meta data for a remote directory. Lastly like
-a \code{-D} option is available to \code{lfs setdirstripe} to allow the inheritance of the
+a {\footnotesize{\texttt{{-D}}}} option is available to {\footnotesize{\texttt{{lfs setdirstripe}}}} to allow the inheritance of the
 remote directories configuration.
 
 
@@ -602,145 +605,149 @@ SSD device. These were configured as MDTs, one per MDS.  We used an in-house
 modified version of the mdtest benchmark version 1.8.3. Our modification
 allowed mdtest to use pre-created directories, which was essential in testing
 the DNE P1. In the standard mdtest each iteration of test creates a new
-directory \code{test-dir}.The \code{`iteration'} which will always be the non-DNE case. To work
-around this case mdtest was modified to use detect the already existing test
-directories. The second change is mdtest runs it test against each test
+directory {\footnotesize{\texttt{test-dir}}}. The
+{\footnotesize{\texttt{`iteration'}}} which will always be the non-DNE case. To
+work around this case mdtest was modified to use detect the already existing
+test directories. The second change is mdtest runs it test against each test
 directory one at  a time but since each directory is located on a single MDT
 with each being on a different server we can not evaluate the performance gain
 in that setup. So the second modification to mdtest was to allow running all
-test directory iterations at the same time in parallel. The mdtest benchmark
-execution script can be found in Appendix A. The modified mdtest source code
-changes will be merged back into the publicly available mdtest soon.
+test directory iterations at the same time in parallel. 
+%The mdtest benchmark execution script can be found in Appendix A. The modified
+%mdtest source code changes will be merged back into the publicly available
+%mdtest soon.
 
 
 For DNE P1 testing, we used 1,000 files per directory as a constant MDS
 directory load. Tests were carried out on October 2014. We used 19 client nodes
 on Arthur with 32 tasks per each, 608 tasks total for the tests. Each test were
-repeated for 10 iterations. A test sample output is given below:
+repeated for 10 iterations. 
 
-\begin{lstlisting}
+%A test sample output is given below:
 
--- started at 10/21/2014 14:22:23 --
-mdtest-1.8.3 was launched with 608 total task(s) 
-on 19 nodes
-Command line used: /lustre/sultan/stf008/scratch
-/jsimmons/mdtest -i 10 -I 1000 -v -u -d /lustre
-/sultan/stf008/scratch/jsimmons/test_mdt0@
-/lustre/sultan/stf008/scratch/jsimmons/test_mdt1
-Path: /lustre/sultan/stf008/scratch/jsimmons
-FS: 797.1 TiB   Used FS: 0.0%   Inodes: 398.7 Mi
-   Used Inodes: 0.0%
-608 tasks, 608000 files/directories
-
-Operation               Duration              Rate
-   ---------               --------              ----
- * iteration 1 *
-   Tree creation     :      0.021 sec,     46.915 ops/sec
-   Directory creation:     50.762 sec,  11977.446 ops/sec
-   Directory stat    :      5.075 sec, 119803.236 ops/sec
-   Directory removal :     17.270 sec,  35206.154 ops/sec
-   File creation     :     18.693 sec,  32525.254 ops/sec
-   File stat         :     23.776 sec,  25571.721 ops/sec
-   File removal      :     38.891 sec,  15633.324 ops/sec
-   Tree removal      :      0.053 sec,     18.905 ops/sec
- * iteration 2 *
-   Tree creation     :      0.016 sec,     63.646 ops/sec
-   Directory creation:     53.253 sec,  11417.247 ops/sec
-   Directory stat    :      4.995 sec, 121719.575 ops/sec
-   Directory removal :     18.486 sec,  32890.048 ops/sec
-   File creation     :     16.301 sec,  37297.574 ops/sec
-   File stat         :     23.698 sec,  25656.142 ops/sec
-   File removal      :     37.839 sec,  16067.906 ops/sec
-   Tree removal      :      0.103 sec,      9.747 ops/sec
- * iteration 3 *
-   Tree creation     :      0.048 sec,     20.784 ops/sec
-   Directory creation:     56.738 sec,  10715.979 ops/sec
-   Directory stat    :      5.006 sec, 121445.960 ops/sec
-   Directory removal :     16.371 sec,  37137.929 ops/sec
-   File creation     :     22.764 sec,  26708.523 ops/sec
-   File stat         :     23.661 sec,  25696.630 ops/sec
-   File removal      :     36.232 sec,  16780.610 ops/sec
-   Tree removal      :      0.086 sec,     11.603 ops/sec
- * iteration 4 *
-   Tree creation     :      0.030 sec,     33.109 ops/sec
-   Directory creation:     65.516 sec,   9280.225 ops/sec
-   Directory stat    :      5.034 sec, 120789.771 ops/sec
-   Directory removal :     10.381 sec,  58570.283 ops/sec
-   File creation     :     31.259 sec,  19450.693 ops/sec
-   File stat         :     23.761 sec,  25587.876 ops/sec
-   File removal      :     37.799 sec,  16085.099 ops/sec
-   Tree removal      :      0.092 sec,     10.826 ops/sec
- * iteration 5 *
-   Tree creation     :      0.126 sec,      7.917 ops/sec
-   Directory creation:     56.259 sec,  10807.185 ops/sec
-   Directory stat    :      4.988 sec, 121891.029 ops/sec
-   Directory removal :     14.342 sec,  42393.831 ops/sec
-   File creation     :     19.169 sec,  31717.449 ops/sec
-   File stat         :     23.509 sec,  25862.805 ops/sec
-   File removal      :     38.008 sec,  15996.705 ops/sec
-   Tree removal      :      0.100 sec,      9.985 ops/sec
- * iteration 6 *
-   Tree creation     :      0.024 sec,     41.264 ops/sec
-   Directory creation:     50.711 sec,  11989.447 ops/sec
-   Directory stat    :      5.050 sec, 120398.587 ops/sec
-   Directory removal :     13.716 sec,  44327.294 ops/sec
-   File creation     :     23.142 sec,  26272.491 ops/sec
-   File stat         :     22.998 sec,  26437.275 ops/sec
-   File removal      :     31.862 sec,  19082.082 ops/sec
-   Tree removal      :      8.808 sec,      0.114 ops/sec
- * iteration 7 *
-   Tree creation     :      0.023 sec,     44.131 ops/sec
-   Directory creation:     49.275 sec,  12338.823 ops/sec
-   Directory stat    :      4.956 sec, 122684.801 ops/sec
-   Directory removal :     17.558 sec,  34627.587 ops/sec
-   File creation     :     17.538 sec,  34667.561 ops/sec
-   File stat         :     23.453 sec,  25924.256 ops/sec
-   File removal      :     38.894 sec,  15632.386 ops/sec
-   Tree removal      :      0.071 sec,     14.008 ops/sec
- * iteration 8 *
-   Tree creation     :      0.027 sec,     37.594 ops/sec
-   Directory creation:     54.556 sec,  11144.496 ops/sec
-   Directory stat    :      5.004 sec, 121512.774 ops/sec
-   Directory removal :     11.720 sec,  51878.271 ops/sec
-   File creation     :     18.477 sec,  32905.459 ops/sec
-   File stat         :     24.315 sec,  25005.094 ops/sec
-   File removal      :     44.397 sec,  13694.737 ops/sec
-   Tree removal      :      0.134 sec,      7.488 ops/sec
- * iteration 9 *
-   Tree creation     :      0.027 sec,     37.394 ops/sec
-   Directory creation:     53.182 sec,  11432.347 ops/sec
-   Directory stat    :      5.063 sec, 120084.463 ops/sec
-   Directory removal :     17.930 sec,  33910.568 ops/sec
-   File creation     :     24.783 sec,  24532.989 ops/sec
-   File stat         :     23.972 sec,  25363.104 ops/sec
-   File removal      :     36.834 sec,  16506.375 ops/sec
-   Tree removal      :      0.063 sec,     15.902 ops/sec
- * iteration 10 *
-   Tree creation     :      0.018 sec,     57.077 ops/sec
-   Directory creation:     59.193 sec,  10271.559 ops/sec
-   Directory stat    :      5.028 sec, 120923.844 ops/sec
-   Directory removal :     16.536 sec,  36768.123 ops/sec
-   File creation     :     24.106 sec,  25222.394 ops/sec
-   File stat         :     23.863 sec,  25478.979 ops/sec
-   File removal      :     39.525 sec,  15382.738 ops/sec
-   Tree removal      :      0.049 sec,     20.433 ops/sec
-
-SUMMARY: (of 10 iterations)
-   Operation                  Max        Min       Mean    Std Dev
-   ---------                  ---        ---       ----    -------
-   Directory creation:  12349.796   9283.845  11145.773    869.879
-   Directory stat    : 123904.353 120985.660 122593.489    887.006
-   Directory removal :  58571.575  32890.567  40771.867   8140.125
-   File creation     :  37338.848  19460.639  29148.300   5243.593
-   File stat         :  26506.056  25039.761  25720.620    360.899
-   File removal      :  19082.413  13694.820  16086.342   1275.494
-   Tree creation     :     63.646      7.917     38.983     15.380
-   Tree removal      :     20.433      0.114     11.901      5.570
-
--- finished at 10/21/2014 14:49:01 --
-Application 183 resources: utime ~174191s, stime ~9984s, 
-Rss ~8752, inblocks ~123436, outblocks ~259931
-\end{lstlisting}
+%\begin{lstlisting}
+%
+%-- started at 10/21/2014 14:22:23 --
+%mdtest-1.8.3 was launched with 608 total task(s) 
+%on 19 nodes
+%Command line used: /lustre/sultan/stf008/scratch
+%/jsimmons/mdtest -i 10 -I 1000 -v -u -d /lustre
+%/sultan/stf008/scratch/jsimmons/test_mdt0@
+%/lustre/sultan/stf008/scratch/jsimmons/test_mdt1
+%Path: /lustre/sultan/stf008/scratch/jsimmons
+%FS: 797.1 TiB   Used FS: 0.0%   Inodes: 398.7 Mi
+%   Used Inodes: 0.0%
+%608 tasks, 608000 files/directories
+%
+%Operation               Duration              Rate
+%   ---------               --------              ----
+% * iteration 1 *
+%   Tree creation     :      0.021 sec,     46.915 ops/sec
+%   Directory creation:     50.762 sec,  11977.446 ops/sec
+%   Directory stat    :      5.075 sec, 119803.236 ops/sec
+%   Directory removal :     17.270 sec,  35206.154 ops/sec
+%   File creation     :     18.693 sec,  32525.254 ops/sec
+%   File stat         :     23.776 sec,  25571.721 ops/sec
+%   File removal      :     38.891 sec,  15633.324 ops/sec
+%   Tree removal      :      0.053 sec,     18.905 ops/sec
+% * iteration 2 *
+%   Tree creation     :      0.016 sec,     63.646 ops/sec
+%   Directory creation:     53.253 sec,  11417.247 ops/sec
+%   Directory stat    :      4.995 sec, 121719.575 ops/sec
+%   Directory removal :     18.486 sec,  32890.048 ops/sec
+%   File creation     :     16.301 sec,  37297.574 ops/sec
+%   File stat         :     23.698 sec,  25656.142 ops/sec
+%   File removal      :     37.839 sec,  16067.906 ops/sec
+%   Tree removal      :      0.103 sec,      9.747 ops/sec
+% * iteration 3 *
+%   Tree creation     :      0.048 sec,     20.784 ops/sec
+%   Directory creation:     56.738 sec,  10715.979 ops/sec
+%   Directory stat    :      5.006 sec, 121445.960 ops/sec
+%   Directory removal :     16.371 sec,  37137.929 ops/sec
+%   File creation     :     22.764 sec,  26708.523 ops/sec
+%   File stat         :     23.661 sec,  25696.630 ops/sec
+%   File removal      :     36.232 sec,  16780.610 ops/sec
+%   Tree removal      :      0.086 sec,     11.603 ops/sec
+% * iteration 4 *
+%   Tree creation     :      0.030 sec,     33.109 ops/sec
+%   Directory creation:     65.516 sec,   9280.225 ops/sec
+%   Directory stat    :      5.034 sec, 120789.771 ops/sec
+%   Directory removal :     10.381 sec,  58570.283 ops/sec
+%   File creation     :     31.259 sec,  19450.693 ops/sec
+%   File stat         :     23.761 sec,  25587.876 ops/sec
+%   File removal      :     37.799 sec,  16085.099 ops/sec
+%   Tree removal      :      0.092 sec,     10.826 ops/sec
+% * iteration 5 *
+%   Tree creation     :      0.126 sec,      7.917 ops/sec
+%   Directory creation:     56.259 sec,  10807.185 ops/sec
+%   Directory stat    :      4.988 sec, 121891.029 ops/sec
+%   Directory removal :     14.342 sec,  42393.831 ops/sec
+%   File creation     :     19.169 sec,  31717.449 ops/sec
+%   File stat         :     23.509 sec,  25862.805 ops/sec
+%   File removal      :     38.008 sec,  15996.705 ops/sec
+%   Tree removal      :      0.100 sec,      9.985 ops/sec
+% * iteration 6 *
+%   Tree creation     :      0.024 sec,     41.264 ops/sec
+%   Directory creation:     50.711 sec,  11989.447 ops/sec
+%   Directory stat    :      5.050 sec, 120398.587 ops/sec
+%   Directory removal :     13.716 sec,  44327.294 ops/sec
+%   File creation     :     23.142 sec,  26272.491 ops/sec
+%   File stat         :     22.998 sec,  26437.275 ops/sec
+%   File removal      :     31.862 sec,  19082.082 ops/sec
+%   Tree removal      :      8.808 sec,      0.114 ops/sec
+% * iteration 7 *
+%   Tree creation     :      0.023 sec,     44.131 ops/sec
+%   Directory creation:     49.275 sec,  12338.823 ops/sec
+%   Directory stat    :      4.956 sec, 122684.801 ops/sec
+%   Directory removal :     17.558 sec,  34627.587 ops/sec
+%   File creation     :     17.538 sec,  34667.561 ops/sec
+%   File stat         :     23.453 sec,  25924.256 ops/sec
+%   File removal      :     38.894 sec,  15632.386 ops/sec
+%   Tree removal      :      0.071 sec,     14.008 ops/sec
+% * iteration 8 *
+%   Tree creation     :      0.027 sec,     37.594 ops/sec
+%   Directory creation:     54.556 sec,  11144.496 ops/sec
+%   Directory stat    :      5.004 sec, 121512.774 ops/sec
+%   Directory removal :     11.720 sec,  51878.271 ops/sec
+%   File creation     :     18.477 sec,  32905.459 ops/sec
+%   File stat         :     24.315 sec,  25005.094 ops/sec
+%   File removal      :     44.397 sec,  13694.737 ops/sec
+%   Tree removal      :      0.134 sec,      7.488 ops/sec
+% * iteration 9 *
+%   Tree creation     :      0.027 sec,     37.394 ops/sec
+%   Directory creation:     53.182 sec,  11432.347 ops/sec
+%   Directory stat    :      5.063 sec, 120084.463 ops/sec
+%   Directory removal :     17.930 sec,  33910.568 ops/sec
+%   File creation     :     24.783 sec,  24532.989 ops/sec
+%   File stat         :     23.972 sec,  25363.104 ops/sec
+%   File removal      :     36.834 sec,  16506.375 ops/sec
+%   Tree removal      :      0.063 sec,     15.902 ops/sec
+% * iteration 10 *
+%   Tree creation     :      0.018 sec,     57.077 ops/sec
+%   Directory creation:     59.193 sec,  10271.559 ops/sec
+%   Directory stat    :      5.028 sec, 120923.844 ops/sec
+%   Directory removal :     16.536 sec,  36768.123 ops/sec
+%   File creation     :     24.106 sec,  25222.394 ops/sec
+%   File stat         :     23.863 sec,  25478.979 ops/sec
+%   File removal      :     39.525 sec,  15382.738 ops/sec
+%   Tree removal      :      0.049 sec,     20.433 ops/sec
+%
+%SUMMARY: (of 10 iterations)
+%   Operation                  Max        Min       Mean    Std Dev
+%   ---------                  ---        ---       ----    -------
+%   Directory creation:  12349.796   9283.845  11145.773    869.879
+%   Directory stat    : 123904.353 120985.660 122593.489    887.006
+%   Directory removal :  58571.575  32890.567  40771.867   8140.125
+%   File creation     :  37338.848  19460.639  29148.300   5243.593
+%   File stat         :  26506.056  25039.761  25720.620    360.899
+%   File removal      :  19082.413  13694.820  16086.342   1275.494
+%   Tree creation     :     63.646      7.917     38.983     15.380
+%   Tree removal      :     20.433      0.114     11.901      5.570
+%
+%-- finished at 10/21/2014 14:49:01 --
+%Application 183 resources: utime ~174191s, stime ~9984s, 
+%Rss ~8752, inblocks ~123436, outblocks ~259931
+%\end{lstlisting}
 
 Figure 3 shows DNE P1 testing for directory IOPs rates with respect to
 increasing MDS nodes. As can be seen, directory deletions quadruple the
@@ -788,9 +795,11 @@ Attached SCSI SSD device. These were configured as MDTs, one per MDS.
 
 We used the same in-house modified version of the mdtest benchmark version
 1.8.3. Our modification allowed mdtest to use pre-created directories, which was
-essential in testing the DNE P1. The mdtest benchmark execution script can be
-found in Appendix A. The modified mdtest source code will be publicly available
-soon.
+essential in testing the DNE P1. 
+
+%The mdtest benchmark execution script can be
+%found in Appendix A. The modified mdtest source code will be publicly available
+%soon.
 
 For DNE P2 testing, we used 1,000 files per directory as a constant MDS
 directory load. Tests were carried out on October 2014. We used 19 client nodes
@@ -824,9 +833,9 @@ backend storage.
 As part of the process of moving to new hardware, we are also making an
 investment in a new backend storage system to store the metadata on. The two
 production systems in place currently share a NetApp E5500 storage array
-composed of 48 900GB SAS drives with a 6Gb/s interconnect to the MDS nodes. For
+composed of 48 900 GB SAS drives with a 6 Gb/s interconnect to the MDS nodes. For
 the upgrade, we are installing two NetApp EF560 storage arrays each with 24x
-1.6TB solid state drives (one storage array per file system), and 12Gb/sec SAS
+1.6TB solid state drives (one storage array per file system), and 12 Gb/sec SAS
 for host connectivity. Even though most of our metadata operations are in
 memory on the MDS nodes, we felt that having 8 MDS servers on a single NetApp
 E5500 would be a bottleneck due to the limited IOP throughput of SAS disks. The
@@ -872,54 +881,57 @@ tool for these tests. File system level tests are not complete at the time of
 writing this document and it will be updated will new results in the near
 future.
 
-\section*{Appendix}
+%\section*{Appendix}
 
-Sarp: This is probably not needed but I am making a dump from the tech report, and I am keeping this for the time being for the sake of completeness. Feel free to knock this one down.
 
-Mdtest script
+%Sarp: This is probably not needed but I am making a dump from the tech report,
+%and I am keeping this for the time being for the sake of completeness. Feel
+%free to knock this one down.
 
-\begin{verbatim}[fontsize=\small]
-#!/bin/bash
-#PBS -l nodes=20
-#PBS -l walltime=24:00:00
-#PBS -N results-mdtest-scale
-#PBS -j oe
+%Mdtest script
 
-MOUNT=<filsystem-name>
-OSTCOUNT=$(lctl get_param -n lov.$MOUNT-clilov*.numobd)
-ITER=5
+%\begin{verbatim}[fontsize=\small]
+%#!/bin/bash
+%#PBS -l nodes=20
+%#PBS -l walltime=24:00:00
+%#PBS -N results-mdtest-scale
+%#PBS -j oe
 
-PBS_JOBID="dne2_8_mds"
-BINDIR=/lustre/$MOUNT/$USER
-OUTDIR=$BINDIR/${PBS_JOBID}_md_test
-[ -e $OUTDIR ] || {
-	mkdir -p $OUTDIR
-	lfs setstripe -c $OSTCOUNT $OUTDIR
-}
-cd $BINDIR
+%MOUNT=<filsystem-name>
+%OSTCOUNT=$(lctl get_param -n lov.$MOUNT-clilov*.numobd)
+%ITER=5
 
-#for filecount in 10000 100000 1000000 10000000
-for filecount in 1000000 10000000
-do
-	TOTAL=$(($filecount / 1000))
+%PBS_JOBID="dne2_8_mds"
+%BINDIR=/lustre/$MOUNT/$USER
+%OUTDIR=$BINDIR/${PBS_JOBID}_md_test
+%[ -e $OUTDIR ] || {
+%	mkdir -p $OUTDIR
+%	lfs setstripe -c $OSTCOUNT $OUTDIR
+%}
+%cd $BINDIR
 
-	for threads in 1 $(seq 5 5 400)
-	do
-		nodes=$(((threads + 19) / 20))
-		[ $nodes -gt 20 ] && nodes=20
-
-		aprun -n $threads -N $nodes $BINDIR/mdtest -I $(( $filecount / $threads)) -i $ITER -d $OUTDIR/shared_${TOTAL}k_$threads
-	done
-
-	#for threads in 1 $(seq 5 5 400)
-	#do
-	#	nodes=$(((threads + 19) / 20))
-	#	[ $nodes -gt 20 ] && nodes=20
-
-	#	aprun -n $threads -N $nodes $BINDIR/mdtest -I $(( $filecount / $threads)) -i $ITER -u  -d $OUTDIR/unique_${TOTAL}k_$threads
-	#done
-done
-\end{verbatim}
+%#for filecount in 10000 100000 1000000 10000000
+%for filecount in 1000000 10000000
+%do
+%	TOTAL=$(($filecount / 1000))
+%
+%	for threads in 1 $(seq 5 5 400)
+%	do
+%		nodes=$(((threads + 19) / 20))
+%		[ $nodes -gt 20 ] && nodes=20
+%
+%		aprun -n $threads -N $nodes $BINDIR/mdtest -I $(( $filecount / $threads)) -i $ITER -d $OUTDIR/shared_${TOTAL}k_$threads
+%	done
+%
+%	#for threads in 1 $(seq 5 5 400)
+%	#do
+%	#	nodes=$(((threads + 19) / 20))
+%	#	[ $nodes -gt 20 ] && nodes=20
+%
+%	#	aprun -n $threads -N $nodes $BINDIR/mdtest -I $(( $filecount / $threads)) -i $ITER -u  -d $OUTDIR/unique_${TOTAL}k_$threads
+%	#done
+%done
+%\end{verbatim}
 
 
 \section{Conclusions \& Future Work}
