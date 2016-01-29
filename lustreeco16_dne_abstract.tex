@@ -395,7 +395,7 @@ of federally sponsored research in accordance with the DOE Public Access Plan
 
 \begin{abstract}
 
-This document describes the Lustre Distributed Name Space (DNE) evaluation
+This paper describes the Lustre Distributed Name Space (DNE) evaluation
 carried at the Oak Ridge Leadership Computing Facility (OLCF) between 2014 and
 2015. DNE is a development project funded by the OpenSFS, to improve Lustre
 metadata performance and scalability. The development effort has been split
@@ -412,7 +412,7 @@ production systems.
 
 % Note that keywords are not normally used for peerreview papers.
 \begin{IEEEkeywords}
-Lustre, parallel file system, file striping.
+Lustre, parallel file system, metadata striping.
 \end{IEEEkeywords}}
 
 
@@ -462,7 +462,7 @@ high-speed data storage in the OLCF was to provide a large Lustre-based
 general-purpose storage system that is globally mount-able by all systems that
 need access. This file system is named Atlas, and is broken into two distinct
 namespaces: Atlas1 and Atlas2. In aggregate, these two storage systems have a
-capacity of 30 PB and a performance throughput of over 1 TB/sec \cite{sarp-cug}. 
+usable capacity of 30 PB and a performance throughput of over 1 TB/sec \cite{sarp-cug}. 
 
 Both Atlas namespaces are built using the Lustre technology. Lustre is an
 open-source parallel file system technology that is currently used in over 70% of
@@ -479,17 +479,16 @@ metadata support for directories distributed over remote metadata server (MDS)
 nodes and metadata target (MDT) devices. This feature was released to public in
 Lustre version 2.4 in 2012. In Phase 2 (DNE P2), the capability for spreading files
 from a single directory over remote MDS nodes and MDT devices was added. This
-will be released to public in Lustre version 2.8.  This document summarizes
+will be released to public in Lustre version 2.8.  This paper summarizes
 OLCF's efforts in evaluating the Lustre DNE feature. Although the OLCF's plan is to deploy
-DNE P2 into production by the second half of 2016, OLCF tests with DNE
-P2 are not yet complete and the final paper will be updated with additional results.
+DNE P2 into production by the second half of 2016.
 
-\subsection{Metadata Contention}
+\subsection{Lustre Distributed Namepsace (DNE)}
 
 Lustre file system can scale up to tens of thousands clients. However, Lustre,
 as of version 2.4, supported only a single metadata server (MDS) per file
-system name space. As client numbers continue to increase, a single MDS quickly
-created a performance and scalability bottleneck. DNE is a Lustre development
+system name space. As client numbers continue to increase, a single MDS can quickly
+create a performance and scalability bottleneck. DNE is a Lustre development
 project, funded by OpenSFS, spreading the Lustre file system metadata namespace
 horizontally and vertically over multiple MDS nodes and metadata targets
 (MDTs). This is akin to spreading the Lustre file system I/O over multiple
@@ -498,19 +497,7 @@ enables namespace size and metadata throughput to be increased by the addition
 of MDTs. In addition, DNE enables an administrator to allocate metadata
 resources to specific directories within the file system. 
 
-\section{What is DNE}
-
-The DNE contract~\cite{dne-contract} was awarded to Whamcloud (now Intel HPDD)
-in 2011, and defined the Lustre development for three projects and eight
-sub projects. These three projects were issued as a single contract since they
-were complementing each other. Overall, these three development efforts
-effectively remove the metadata contention problem on Lustre. Of these three
-projects, Project 1 focused on improving the single server metadata performance
-and provided SMP node affinity and parallel directory support. The second
-project (i.e. DNE) targeted distributing the metadata load on remote and
-striped directories. The third project was architected to improve the Lustre
-file system checker to provide support in light of the first projects.  DNE P1
-enabled deployment of multiple MDTs on multiple MDS nodes and Lustre
+DNE P1 enabled deployment of multiple MDTs on multiple MDS nodes and Lustre
 sub-directories were now distributed over multiple metadata targets (MDTs).
 Sub-directory distribution was defined as an administrative operation and was
 executed using the Lustre specific {\footnotesize{\texttt{lfs mkdir}}} command. Figure 1 illustrates the
@@ -529,27 +516,27 @@ located.
   \caption{DNE P1 Remote Directories (Courtesy of OpenSFS)}
 \end{figure}
  
-DNE P2 will provide Lustre the capability to create striped directory in a
+DNE P2 provides Lustre the capability to create striped directory in a
 similar fashion as bulk I/O is distributed across OSTs. The OSS bulk I/O
 packets are distributed in a round robin fashion with applied weights to help
-keep OST usage nearly the same across the namespace. In the case of meta data
-the distribution is based on a hash calculated for the file in interest. You
-can control the hashing done for a striped directory with
+keep OST usage nearly the same across the namespace. In the case of metadata
+the distribution is based on a hash calculated for the file in interest. 
+The hashing for a striped directory can be controlled with
 {\footnotesize{\texttt{lfs setdirstripe}}} using the
 {\footnotesize{\texttt{–t}}} or {\footnotesize{\texttt{--hash-type}}} option.
 Currently only two options are available, {\footnotesize{\texttt{all\_char}}}
 which is sum of ASCII characters modulo number of MDTs, or
 {\footnotesize{\texttt{fnv\_1a\_64}}} that is the
-{\footnotesize{\texttt{Fowler-Noll-Vo (FNV-1a)}}} algorithm. From the previous
-example you can see the user interface has moved from DNE P1
+{\footnotesize{\texttt{Fowler-Noll-Vo (FNV-1a)}}} algorithm. As can be seen,
+the user interface has moved from DNE P1
 {\footnotesize{\texttt{lfs mkdir}}} to using {\footnotesize{\texttt{lfs
 setdirstripe}}}  for DNE P2. Much like DNE P1 directories creation can be
 limited to personnel with root privileges. By default, only directories on the
 very first MDT can contain directories that are not on the same MDT. Figure 2
 illustrates this Lustre striped directory concept, where a striped directory is
 defined as the contents of a given directory are distributed over multiple
-MDTs.  Looking back to Figure 1 you will see a similar limitation with DNE P1
-in which data from the root remote directory is cached on the first MDT.  
+MDTs. Comparing with Figure 1, a similar limitation with DNE P1
+in which data from the root remote directory is cached on the first MDT can be seen.
 
 \begin{figure}[!ht]
   \centering
@@ -562,19 +549,19 @@ amount of data. In testing, when the file and directory count reached high
 enough, the first MDT filled rapidly. The first MDT was the smallest in the
 test cluster, exasperating the issue.  For DNE P2 it is possible to
 create remote directories with its parent directory located on any MDT
-by enabling {\footnotesize{\texttt{remote\_dir}}}. This can be done by issuing the follow command:
+by enabling {\footnotesize{\texttt{remote\_dir}}}. This can be done by issuing the following command:
 
 {\footnotesize{\texttt{lctl set\_param mdt.*.enable\_remote\_dir=1}}}
-
+\\
 to all available MDS servers. Another feature available in DNE P2 is the
-ability to allow non root users to create remote directories. Currently, this
+ability to allow non-root users to create remote directories. Currently, this
 is disabled by default. Two other modes exist for this feature. To enable a
 specific group to create a remote directory, issue the following command
 to all MDS nodes:
 
 {\footnotesize{\texttt{{lct set\_param mdt.*.enable\_remote\_dir\_gid
 =``group\_id''}}}} 
-
+\\
 To allow any user to create remote directories set {\footnotesize{\texttt{``group\_id''}}} 
 to {\footnotesize{\texttt{-1}}}. All functionality discussed thus far has pertained
 specifically to DNE2. More functionality exists within {\footnotesize{\texttt{lfs setdirstripe}}},
@@ -583,9 +570,9 @@ placement on the OSS servers. This command leverages familiarity with
 {\footnotesize{\texttt{lfs getstripe}}} for quick user startup. The 
 {\footnotesize{\texttt{{lfs setdirstripe}}}}  command, like its counter part, allows
 setting the striping count and striping index. The striping index controls the first
-MDT that stores meta data information. This is most helpful when avoiding MDTs
+MDT that stores metadata information. This is most helpful when avoiding MDTs
 that lack enough disk space. The stripe count determines how many MDTs
-will be used to store the file's meta data for a remote directory. Lastly,
+will be used to store the file's metadata for a remote directory. Lastly,
 a {\footnotesize{\texttt{{-D}}}} option is available to {\footnotesize{\texttt{{lfs setdirstripe}}}} to allow the inheritance of the
 remote directories configuration.
 
@@ -596,13 +583,13 @@ The test environment consisted of Arthur, which is a single Cray XK7 cabinet wit
 22 nodes. At the time of DNE P1 tests, Arthur nodes ran the Cray CLE 5.2.UP02
 operating system. The Lustre version on clients and servers was 2.5.3. Sixteen separate x86\_64
 systems were configured as Lustre MDS nodes. 
-Each node had a single Toshiba MBF2600RC Serial Attached SCSI
+Each server had a single Toshiba MBF2600RC Serial Attached SCSI
 SSD device. These were configured as MDTs, one per MDS.  Benchmarking tests
 consisted of the mdtest benchmark version 1.8.3, modified to use pre-created
 directories. This was essential for DNE P1 testing. 
 In the standard mdtest, each iteration of test creates a new
-directory {\footnotesize{\texttt{test-dir}}}. The
-{\footnotesize{\texttt{`iteration'}}} which will always be the non-DNE case. To
+directory {\footnotesize{\texttt{test-dir}}}, which will always be created as
+a non-DNE directory. To
 work around this case mdtest was modified to detect the already existing
 test directories. The second change to mdtest allows running tests against
 different directories simultaneously. Without this modification, an evaluation
@@ -782,7 +769,7 @@ The test environment consisted of Arthur, which is a single Cray XK7 cabinet wit
 operating system. The Lustre version on clients was a specially built pre 2.8
 client with a constant evolving patch set. Sixteen separate x86\_64 systems were
 configured as Lustre MDS nodes. Servers were running the same Lustre pre 2.8
-version as the clients. Each node had a single Toshiba MBF2600RC Serial
+version as the clients. Each server had a single Toshiba MBF2600RC Serial
 Attached SCSI SSD device. These were configured as MDTs, one per MDS. 
 
 Using the same in-house modified version of the mdtest benchmark allowed for
