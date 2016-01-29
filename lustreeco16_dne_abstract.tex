@@ -446,7 +446,7 @@ Lustre, parallel file system, file striping.
 
 \section{Introduction}
 
-The Oak Ridge National Laboratory Leadership Computing Facility (OLCF) at the
+The Oak Ridge Leadership Computing Facility (OLCF) at 
 Oak Ridge National Laboratory (ORNL) is currently the home of the world's
 second-fastest supercomputer named Titan. Any large-scale computational
 resource needs to have a storage system that is designed to ingest data at
@@ -462,28 +462,27 @@ high-speed data storage in the OLCF was to provide a large Lustre-based
 general-purpose storage system that is globally mount-able by all systems that
 need access. This file system is named Atlas, and is broken into two distinct
 namespaces: Atlas1 and Atlas2. In aggregate, these two storage systems have a
-capacity of 30 PB and a performance throughput of over 1 TB/sec. 
+capacity of 30 PB and a performance throughput of over 1 TB/sec \cite{sarp-cug}. 
 
 Both Atlas namespaces are built using the Lustre technology. Lustre is an
 open-source parallel file system technology that is currently used over 70% of
 the Top500 systems around the world. Lustre is a high-performance file system
 scalable to tens of thousands of clients. Although Lustre can achieve very high
-file I/O performance numbers (e.g. 3 TB/s at Rikken, Japan, +1 TB/s at Titan,
+file I/O performance numbers (e.g. 3 TB/s at Riken, Japan, +1 TB/s at Titan,
 OLCF and BlueWaters, NCSA), it supported only one metadata server per file
 system namespace until recently. This was one of the biggest limitations Lustre
 had. To alleviate this problem, OpenSFS contracted Intel to develop a solution
 \cite{dne-contract}.  The Distributed Namespace (DNE) development effort
-started in 2011 and targeted improving the metadata server scalability.  The
-DNE effort was split up into two development phases.  Phase 1 (DNE P1) provided
+started in 2011 and targeted improving metadata server scalability.  The
+DNE effort was split into two development phases.  Phase 1 (DNE P1) provided
 metadata support for directories distributed over remote metadata server (MDS)
 nodes and metadata target (MDT) devices. This feature was released to public in
-Lustre version 2.4 in 2012. In Phase 2 (DNE P2), the capability for splitting
-up a single directory over remote MDS nodes and MDT devices was added. This
+Lustre version 2.4 in 2012. In Phase 2 (DNE P2), the capability for spreading files
+from a single directory over remote MDS nodes and MDT devices was added. This
 will be released to public in Lustre version 2.8.  This document summarizes
-OLCF’s efforts in evaluating the Lustre DNE feature. The OLCF’s plan is deploy
-DNE P2 into production by the second half of 2016, however, OLCF tests with DNE
-P2 is not yet complete and this document will updated with new results in the
-near future.
+OLCF's efforts in evaluating the Lustre DNE feature. Although the OLCF's plan is to deploy
+DNE P2 into production by the second half of 2016, OLCF tests with DNE
+P2 are not yet complete and the final paper will be updated with additional results.
 
 \subsection{Metadata Contention}
 
@@ -596,32 +595,30 @@ remote directories configuration.
 
 \subsection{DNE P1 Evaluation}
 
-Our test environment consisted Arthur, which is a single Cray XK7 cabinet with
-XYZ nodes. Arthur at the time of DNE P1 tests were running Cray CLE 5.2.UP02
-operating system. The Lustre version on clients was 2.5.3. 16 separate x86\_64
-systems were configured as Lustre MDS nodes. Servers were running Lustre
-version 2.5.3. Each node had a single Toshiba MBF2600RC Serial Attached SCSI
+Our test environment used Arthur, a single Cray XK7 cabinet with
+\todo{TO-DO: XYZ??} nodes. At the time of DNE P1 tests, Arthur nodes were running the Cray CLE 5.2.UP02
+operating system. The Lustre version on clients and servers was 2.5.3. Sixteen separate x86\_64
+systems were configured as Lustre MDS nodes. 
+Each node had a single Toshiba MBF2600RC Serial Attached SCSI
 SSD device. These were configured as MDTs, one per MDS.  We used an in-house
 modified version of the mdtest benchmark version 1.8.3. Our modification
 allowed mdtest to use pre-created directories, which was essential in testing
-the DNE P1. In the standard mdtest each iteration of test creates a new
-directory {\footnotesize{\texttt{test-dir}}}. The
-{\footnotesize{\texttt{`iteration'}}} which will always be the non-DNE case. To
-work around this case mdtest was modified to use detect the already existing
-test directories. The second change is mdtest runs it test against each test
-directory one at  a time but since each directory is located on a single MDT
+the DNE P1. In standard mdtest, each iteration of test creates a new
+directory {\footnotesize{\texttt{test-dir}}}, which always results in testing the non-DNE case. To
+work around this problem mdtest was modified to detect and use existing
+test directories. Standard mdtest also iterates sequentially over each target
+directory, but since each directory is located on a single MDT
 with each being on a different server we can not evaluate the performance gain
-in that setup. So the second modification to mdtest was to allow running all
+of DNE P1 in that setup. Thus, the second mdtest modification required was to allow running all
 test directory iterations at the same time in parallel. 
 %The mdtest benchmark execution script can be found in Appendix A. The modified
 %mdtest source code changes will be merged back into the publicly available
 %mdtest soon.
 
-
 For DNE P1 testing, we used 1,000 files per directory as a constant MDS
-directory load. Tests were carried out on October 2014. We used 19 client nodes
-on Arthur with 32 tasks per each, 608 tasks total for the tests. Each test were
-repeated for 10 iterations. 
+directory load. Tests were carried out during October of 2014. We used nineteen client nodes
+on Arthur with 32 tasks per node, for a total of 608 tasks. Each test was run
+ten times. 
 
 %A test sample output is given below:
 
@@ -975,13 +972,6 @@ which is a DOE Office of Science User Facility supported under Contract DE-AC05-
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
 \begin{thebibliography}{1}
-
-
-\bibitem{ior}
-"chaos/ior - Parallel filesystem I/O benchmark", \texttt{https://github.com/chaos/ior}.
-
-\bibitem{synthetic-pfl}
-Joel Reed et al., "Evaluating Dynamic File Striping for Lustre", \emph{International Workshop on the Lustre Ecosystem: Challenges and Opportunities}, March 2015.
 
 \bibitem{sarp-cug}
 Sarp Oral et al., "OLCF`s 1TB$/$s, Next-Generation Lustre File System", \emph{Cray User Group 2013}, May 2013.
