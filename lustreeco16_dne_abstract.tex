@@ -816,43 +816,43 @@ E5500 would be a bottleneck due to the limited IOP throughput of SAS disks. The
 NetApp EF560 all solid-state disk solution has provided over 30x improvement in
 IOPs at the block level, and upwards of a 10x speedup for certain workloads.
 
-\section{Hardware Evaluation for Production Deployment}
-
-We had to make many considerations in measuring the performance of the updated
-code. Lustre metadata is written 4 kB out a time assuming that you are not
-using a kernel I/O scheduler, which we do not recommend. These small IO size
-lends itself to do very well with flash based storage because of the lower
-latency and higher IOPs.
-
-In our evaluation of the new storage system we had to conduct tests at the
-block level and the Lustre level. How you test the block level depends heavily
-on the feature set of the storage hardware. In the case of the NetApp EF560, we
-tested read/write performance for all of the following scenarios:
-
-\begin{itemize}
-
-\item Varying I/O segment sizes (32 kB, 64 kB, 128 kB, 256 kB, and 512 kB)
-
-\item Enabling/disabling the DA (data assurance) feature
-
-\item Testing RAID 10 volume groups of varying number of disks (since some RAID subsystems do not handle large RAID volume group performance well)
-
-\item Using a parity decoupled disk volume instead of a RAID10
-
-\item Testing performance from a single node and from all 4 nodes attached to each disk system.
-
-\end{itemize}
-
-Block level IO performance was measured using a tool developed at the OLCF
-called fair-lio. It creates a random 4 kB workload, and very effectively
-stresses out the disks system. \todo{TO-DO: Updated block results}
-After qualifying the performance of the block level performance we will
-evaluate the performance at the Lustre software layer. To do this we will
-create a small Lustre file system using the new metadata servers and new NetApp
-EF560 storage system as the metadata target. We will use the mdtest benchmark
-tool for these tests. File system level tests are not complete at the time of
-writing this document and it will be updated will new results in the near
-future.
+%%\section{Hardware Evaluation for Production Deployment}
+%%
+%%We had to make many considerations in measuring the performance of the updated
+%%code. Lustre metadata is written 4 kB out a time assuming that you are not
+%%using a kernel I/O scheduler, which we do not recommend. These small IO size
+%%lends itself to do very well with flash based storage because of the lower
+%%latency and higher IOPs.
+%%
+%%In our evaluation of the new storage system we had to conduct tests at the
+%%block level and the Lustre level. How you test the block level depends heavily
+%%on the feature set of the storage hardware. In the case of the NetApp EF560, we
+%%tested read/write performance for all of the following scenarios:
+%%
+%%\begin{itemize}
+%%
+%%\item Varying I/O segment sizes (32 kB, 64 kB, 128 kB, 256 kB, and 512 kB)
+%%
+%%\item Enabling/disabling the DA (data assurance) feature
+%%
+%%\item Testing RAID 10 volume groups of varying number of disks (since some RAID subsystems do not handle large RAID volume group performance well)
+%%
+%%\item Using a parity decoupled disk volume instead of a RAID10
+%%
+%%\item Testing performance from a single node and from all 4 nodes attached to each disk system.
+%%
+%%\end{itemize}
+%%
+%%Block level IO performance was measured using a tool developed at the OLCF
+%%called fair-lio. It creates a random 4 kB workload, and very effectively
+%%stresses out the disks system. \todo{TO-DO: Updated block results}
+%%After qualifying the performance of the block level performance we will
+%%evaluate the performance at the Lustre software layer. To do this we will
+%%create a small Lustre file system using the new metadata servers and new NetApp
+%%EF560 storage system as the metadata target. We will use the mdtest benchmark
+%%tool for these tests. File system level tests are not complete at the time of
+%%writing this document and it will be updated will new results in the near
+%%future.
 
 %\section*{Appendix}
 
@@ -909,7 +909,11 @@ future.
 
 \section{Conclusions \& Future Work}
 
-Our results generally match expectations, which is good.
+Distributed Name Space provides increased metadata performance by 
+striping across multiple metadata servers. There is an expectation
+that with user applications with heavy metadata loads should see a
+performance increase when using DNE striped directories. Initial
+DNE testing matches these expectations.
 
 % conference papers do not normally have an appendix
 
@@ -953,7 +957,7 @@ which is a DOE Office of Science User Facility supported under Contract DE-AC05-
 Sarp Oral et al., "OLCF`s 1TB$/$s, Next-Generation Lustre File System", \emph{Cray User Group 2013}, May 2013.
 
 \bibitem{dne-contract}
-"OpenSFS DNE Contract", \texttt{http://wiki.opensfs.org/Contract\_SFS-DEV-001}.
+"OpenSFS DNE Contract", \\\texttt{http://wiki.opensfs.org/Contract\_SFS-DEV-001}.
 
 \end{thebibliography}
 
