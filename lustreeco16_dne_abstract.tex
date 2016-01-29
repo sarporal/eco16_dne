@@ -330,7 +330,7 @@ basicstyle=\footnotesize    % the size of the fonts that are used for the line-n
 % not capitalized unless they are the first or last word of the title.
 % Linebreaks \\ can be used within to get better formatting as desired.
 % Do not put math or special symbols in the title.
-\title{Lustre Distributed Name Space (DNE) Evaluation}
+\title{Lustre Distributed Name Space (DNE) Evaluation\\(Extended Abstract)}
 
 
 % author names and affiliations
@@ -465,7 +465,7 @@ namespaces: Atlas1 and Atlas2. In aggregate, these two storage systems have a
 capacity of 30 PB and a performance throughput of over 1 TB/sec \cite{sarp-cug}. 
 
 Both Atlas namespaces are built using the Lustre technology. Lustre is an
-open-source parallel file system technology that is currently used over 70% of
+open-source parallel file system technology that is currently used in over 70% of
 the Top500 systems around the world. Lustre is a high-performance file system
 scalable to tens of thousands of clients. Although Lustre can achieve very high
 file I/O performance numbers (e.g. 3 TB/s at Riken, Japan, +1 TB/s at Titan,
@@ -557,68 +557,63 @@ in which data from the root remote directory is cached on the first MDT.
   \caption{DNE P2 Remote Directories (Courtesy of OpenSFS)}
 \end{figure}
 
-In either case we can see the limitation is that MDT1 contains a
-disproportionate amount of data. In my testing when the file and directory
-count reached high enough the first MDT filled rapidly. Especial in my case the
-first MDT was the smallest in my test cluster. For DNE P2 it is possible to
-create remote directories with its parent directory located place on any MDT
-when you enable {\footnotesize{\texttt{remote\_dir}}}. This can be done by issuing the follow command:
+In either case, the limitation is that MDT1 contains a disproportionate
+amount of data. In testing, when the file and directory count reached high 
+enough, the first MDT filled rapidly. The first MDT was the smallest in the
+test cluster, exasperating the issue.  For DNE P2 it is possible to
+create remote directories with its parent directory located on any MDT
+by enabling {\footnotesize{\texttt{remote\_dir}}}. This can be done by issuing the follow command:
 
 {\footnotesize{\texttt{lctl set\_param mdt.*.enable\_remote\_dir=1}}}
 
 to all available MDS servers. Another feature available in DNE P2 is the
-ability to allow non root users to create remote directories. Currently you can
-use the default setup up only root or you allow a single specific group to
-create a remote directory which handles the case of specific non root
-administrative accounts. Lastly you can allow all groups. The way to manage
-this feature is by issuing the following command to all MDS servers:
+ability to allow non root users to create remote directories. Currently, this
+is disabled by default. Two other modes exist for this feature. To enable a
+specific group to create a remote directory, issue the following command
+to all MDS nodes:
 
 {\footnotesize{\texttt{{lct set\_param mdt.*.enable\_remote\_dir\_gid
 =``group\_id''}}}} 
 
-To allow any user to create remove directories set {\footnotesize{\texttt{``group\_id''}}} to {\footnotesize{\texttt{-1}}}. So far all
-the functionality discussed has pertained specifically to DNE2. More
-functionality exist to the {\footnotesize{\texttt{lfs setdirstripe}}} which was modeled after the same
-functionality seen with {\footnotesize{\texttt{lfs setstripe}}}; which is used to manage I/O bulk data
-placement on the OSS servers. This was to done to make it easy for new users to
-learn quickly this tool since they are already familiar with {\footnotesize{\texttt{lfs getstripe}}}. The
-{\footnotesize{\texttt{{lfs setdirstripe}}}} like its counter part allows setting the striping count and
-striping index. The striping index can be used to control which MDT to be first
-use to store meta data information. This is most helpful in the case to avoid
-MDTs that lack enough disk space. The stripe count determines how many MDTs
-will be used to store the file's meta data for a remote directory. Lastly like
+To allow any user to create remote directories set {\footnotesize{\texttt{``group\_id''}}} 
+to {\footnotesize{\texttt{-1}}}. All functionality discussed thus far has pertained
+specifically to DNE2. More functionality exists within {\footnotesize{\texttt{lfs setdirstripe}}},
+modeled after {\footnotesize{\texttt{lfs setstripe}}}; which is used to manage I/O bulk data
+placement on the OSS servers. This command leverages familiarity with
+{\footnotesize{\texttt{lfs getstripe}}} for quick user startup. The 
+{\footnotesize{\texttt{{lfs setdirstripe}}}}  command, like its counter part, allows
+setting the striping count and striping index. The striping index controls the first
+MDT that stores meta data information. This is most helpful when avoiding MDTs
+that lack enough disk space. The stripe count determines how many MDTs
+will be used to store the file's meta data for a remote directory. Lastly,
 a {\footnotesize{\texttt{{-D}}}} option is available to {\footnotesize{\texttt{{lfs setdirstripe}}}} to allow the inheritance of the
 remote directories configuration.
 
 
-
-
 \subsection{DNE P1 Evaluation}
 
-Our test environment used Arthur, a single Cray XK7 cabinet with
-\todo{TO-DO: XYZ??} nodes. At the time of DNE P1 tests, Arthur nodes were running the Cray CLE 5.2.UP02
+The test environment consisted of Arthur, which is a single Cray XK7 cabinet with
+22 nodes. At the time of DNE P1 tests, Arthur nodes ran the Cray CLE 5.2.UP02
 operating system. The Lustre version on clients and servers was 2.5.3. Sixteen separate x86\_64
 systems were configured as Lustre MDS nodes. 
 Each node had a single Toshiba MBF2600RC Serial Attached SCSI
-SSD device. These were configured as MDTs, one per MDS.  We used an in-house
-modified version of the mdtest benchmark version 1.8.3. Our modification
-allowed mdtest to use pre-created directories, which was essential in testing
-the DNE P1. In standard mdtest, each iteration of test creates a new
-directory {\footnotesize{\texttt{test-dir}}}, which always results in testing the non-DNE case. To
-work around this problem mdtest was modified to detect and use existing
-test directories. Standard mdtest also iterates sequentially over each target
-directory, but since each directory is located on a single MDT
-with each being on a different server we can not evaluate the performance gain
-of DNE P1 in that setup. Thus, the second mdtest modification required was to allow running all
-test directory iterations at the same time in parallel. 
+SSD device. These were configured as MDTs, one per MDS.  Benchmarking tests
+consisted of the mdtest benchmark version 1.8.3, modified to use pre-created
+directories. This was essential for DNE P1 testing. 
+In the standard mdtest, each iteration of test creates a new
+directory {\footnotesize{\texttt{test-dir}}}. The
+{\footnotesize{\texttt{`iteration'}}} which will always be the non-DNE case. To
+work around this case mdtest was modified to detect the already existing
+test directories. The second change to mdtest allows running tests against
+different directories simultaneously. Without this modification, an evaluation
+using mdtest would not evaluate performance gains.
 %The mdtest benchmark execution script can be found in Appendix A. The modified
 %mdtest source code changes will be merged back into the publicly available
 %mdtest soon.
 
-For DNE P1 testing, we used 1,000 files per directory as a constant MDS
-directory load. Tests were carried out during October of 2014. We used nineteen client nodes
-on Arthur with 32 tasks per node, for a total of 608 tasks. Each test was run
-ten times. 
+DNE P1 testing consisted of 1,000 files per directory as a constant MDS
+directory load. Tests were carried out during October of 2014. Tests consisted of ten
+iterations on nineteen client nodes of Arthur, with 32 tasks each, for 608 tasks total.
 
 %A test sample output is given below:
 
@@ -764,7 +759,7 @@ rates were the primary performance concern.
 \end{figure}
 
 
-Figure 4 shows our DNE P1 test results with file operations. As can be seen,
+Figure 4 shows DNE P1 test results with file operations. As can be seen,
 file deletion operations scale up nicely up to 15 MDS nodes, where increasing
 number of MDS nodes hurts file stat operation rates. File creation performance
 doubles up until five MDS nodes only.  Combining DNE P1 test results for
@@ -782,44 +777,40 @@ per namespace for production deployments.
 
 \subsection{DNE P2}
 
-Our test environment consisted Arthur, which is a single Cray XK7 cabinet with
-XYZ nodes. Arthur at the time of DNE P2 tests were running Cray CLE 5.2.UP02
+The test environment consisted of Arthur, which is a single Cray XK7 cabinet with
+22 nodes. At the time of DNE P2 tests, Arthur ran the Cray CLE 5.2.UP02
 operating system. The Lustre version on clients was a specially built pre 2.8
 client with a constant evolving patch set. Sixteen separate x86\_64 systems were
 configured as Lustre MDS nodes. Servers were running the same Lustre pre 2.8
 version as the clients. Each node had a single Toshiba MBF2600RC Serial
 Attached SCSI SSD device. These were configured as MDTs, one per MDS. 
 
-We used the same in-house modified version of the mdtest benchmark version
-1.8.3. Our modification allowed mdtest to use pre-created directories, which was
-essential in testing the DNE P1. 
+Using the same in-house modified version of the mdtest benchmark allowed for
+pre-created directories for DNE P2 testing.
 
 %The mdtest benchmark execution script can be
 %found in Appendix A. The modified mdtest source code will be publicly available
 %soon.
 
-For DNE P2 testing, we used 1,000 files per directory as a constant MDS
-directory load. Tests were carried out on October 2014. We used 19 client nodes
-on Arthur with 32 tasks per each, 608 tasks total for the tests. Each test were
-repeated for 10 iterations.
-
+DNE P2 testing consisted of 1,000 files per directory as a constant MDS
+directory load. Tests were carried out on October 2014. Tests consisted of 10
+iterations on 19 client nodes of Arthur, with 32 tasks each, for 608 tasks total.
 
 \section{Production Deployment}
 
 This report has focused mainly on the software side of the DNE Phase 2 roll-out,
 however it is important to understand the OLCF's considerations for the
-hardware side of this upgrade. We currently have a single metadata server per
+hardware side of this upgrade. There is currently a single metadata server per
 Atlas file system. The plan for production is to increase to four metadata
-servers per Atlas file system (eight total). Our current production metadata
+servers per Atlas file system (eight total). The current production metadata
 nodes (MDS nodes) are dual-socket six-core Intel Sandy Bridge 2.5 GHz servers
 each with 256GB DDR3 RAM distributed evenly between the two processors, a
 single port FDR InfiniBand card, and a dual port 6Gb/s SAS card. Due to the
 limited abilities for SMP scaling in the Lustre MDS code and the added NUMA
 latency of having the IB card, SAS card, and Lustre MDS processes potentially
-living on different CPUs we decided to rethink our approach to building MDS
-servers.
+living on different CPUs, OLCF shifted design for the new MDS nodes.
 
-The new systems will have a single socket eight-core Intel Haswell 3.2GHz
+The new systems have a single socket eight-core Intel Haswell 3.2GHz
 processor, 256GB DDR RAM, a single port FDR InfiniBand card, and a dual port
 12Gb/s SAS card. The new single-socket MDS nodes should reduce NUMA induced
 latency, the faster CPU frequency should increase responsiveness from the MDT
@@ -827,17 +818,16 @@ threads (due to limited SMP scaling), and the faster SAS link to disk storage
 should also increase the performance for flushes (syncs) from MDS memory to the
 backend storage.
 
-As part of the process of moving to new hardware, we are also making an
-investment in a new backend storage system to store the metadata on. The two
+An additional change in hardware is a new backend storage system for the MDT. The two
 production systems in place currently share a NetApp E5500 storage array
-composed of 48 900 GB SAS drives with a 6 Gb/s interconnect to the MDS nodes. For
-the upgrade, we are installing two NetApp EF560 storage arrays each with 24x
-1.6TB solid state drives (one storage array per file system), and 12 Gb/sec SAS
-for host connectivity. Even though most of our metadata operations are in
-memory on the MDS nodes, we felt that having 8 MDS servers on a single NetApp
+composed of 48 900 GB SAS drives with a 6 Gb/s interconnect to the MDS nodes. The
+upgrade consists of two NetApp EF560 storage arrays each with 24x
+800GB solid state drives (one storage array per file system), and 12 Gb/sec SAS
+for host connectivity. Even though most metadata operations are in
+memory on the MDS nodes, having 8 MDS servers on a single NetApp
 E5500 would be a bottleneck due to the limited IOP throughput of SAS disks. The
 NetApp EF560 all solid-state disk solution has provided over 30x improvement in
-IOPs at the block level.
+IOPs at the block level, and upwards of a 10x speedup for certain workloads.
 
 \section{Hardware Evaluation for Production Deployment}
 
@@ -866,10 +856,9 @@ tested read/write performance for all of the following scenarios:
 
 \end{itemize}
 
-To test the block level IO performance we used a tool developed at the OLCF
+Block level IO performance was measured using a tool developed at the OLCF
 called fair-lio. It creates a random 4 kB workload, and very effectively
-stresses out the disks system. Block-level tests are ongoing at the time of
-writing this document. It will be updated will new results in the near future.
+stresses out the disks system. \todo{TO-DO: Updated block results}
 After qualifying the performance of the block level performance we will
 evaluate the performance at the Lustre software layer. To do this we will
 create a small Lustre file system using the new metadata servers and new NetApp
